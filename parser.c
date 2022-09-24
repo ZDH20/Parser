@@ -42,6 +42,13 @@ void parser_read(Parser *parser, const char *path) {
   fclose(fp);
 }
 
+// Assigns a char * into parser.
+void parser_assign(Parser *parser, const char *word) {
+  for (int i = 0; *(word + i) != '\0'; i++) {
+    parser_append(parser, *(word + i));
+  }
+}
+
 // Takes a parser pointer, a start index, and end index,
 // and a replace character. It will then replace everything
 // in the range from start -> end with the replace character.
@@ -62,7 +69,7 @@ void cleanup(Parser *parser, int start, int end, char replace) {
 // This will find all occurrences of `word` in the
 // parser and will find the start and end
 // indices and send them to cleanup() to remove them.
-void parser_remove(Parser *parser, char *word) {
+void parser_remove(Parser *parser, const char *word) {
   size_t i;
   int word_idx = 0, start = -1, end = -1;
   for (size_t i = 0; i < parser->sz; i++) {

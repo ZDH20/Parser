@@ -13,7 +13,8 @@ Parser parser_init();
 void parser_read(Parser *, const char *);
 void parser_dump(const Parser *);
 void parser_append(Parser *, char);
-void parser_remove(Parser *, char *);
+void parser_remove(Parser *, const char *);
 void parser_free(Parser *);
+void parser_assign(Parser *, const char *);
 
 #endif // PARSER_H
