@@ -24,7 +24,14 @@ void parser_add_token(Parser *parser, char *token) {
 }
 
 // Tokenizes the parser at a given delimiter.
-void parser_tokenize_at_delim(Parser *parser, char delim) {
+void parser_tokenize_at_delim(Parser *parser, char delim, bool ignore_newline) {
+
+  // Reset the tokens.
+  for (size_t i = 0; i < TOKEN_SZ; i++) {
+    memset(parser->tokens[i], '\0', sizeof(parser->tokens[i][0]) * TOKEN_SZ);
+  }
+
+  // Begin.
   const size_t tmp_str_cap = 1000;
   int idx = -1;
   for (size_t i = 0; i < parser->sz; i++) {
@@ -33,14 +40,17 @@ void parser_tokenize_at_delim(Parser *parser, char delim) {
     }
     else if (parser->data[i] == delim) {
       char tmp[tmp_str_cap];
-      memset(tmp, '\0', sizeof(char) * tmp_str_cap);
       size_t tmp_str_sz = 0;
+      memset(tmp, '\0', sizeof(char) * tmp_str_cap);
+      // Build the temporary string as a token.
       for (int j = idx; j < i; j++) {
         assert(tmp_str_sz < tmp_str_cap);
+        if (parser->data[j] == '\n' && ignore_newline) continue;
         tmp[tmp_str_sz++] = parser->data[j];
       }
-      idx = -1;
+      // Add the token.
       parser_add_token(parser, tmp);
+      idx = -1;
     }
   }
 }
@@ -48,7 +58,7 @@ void parser_tokenize_at_delim(Parser *parser, char delim) {
 // Dump all tokens in the parser.
 void parser_dump_tokens(const Parser *parser) {
   for (size_t i = 0; i < parser->tokens_sz; i++) {
-    printf("%s\n", parser->tokens[i]);
+    printf("%s", parser->tokens[i]);
   }
 }
 

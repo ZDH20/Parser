@@ -3,6 +3,7 @@
 #define PARSER_INIT_SZ 1000
 #define TOKEN_SZ 1000
 
+#include <stdbool.h>
 #include <stdlib.h>
 
 typedef struct Parser {
@@ -19,7 +20,7 @@ void parser_append(Parser *, char);
 void parser_remove(Parser *, const char *);
 void parser_free(Parser *);
 void parser_assign(Parser *, const char *);
-void parser_tokenize_at_delim(Parser *, char);
+void parser_tokenize_at_delim(Parser *, char, bool);
 void parser_trim(Parser *);
 void parser_dump_tokens(const Parser *);
 
