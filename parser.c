@@ -1,4 +1,5 @@
 #include "parser.h"
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -9,7 +10,46 @@ Parser parser_init() {
   p.data = (char *)malloc(sizeof(char) * PARSER_INIT_SZ);
   p.sz   = 0;
   p.cap  = PARSER_INIT_SZ;
+  p.tokens_sz = 0;
+  for (size_t i = 0; i < TOKEN_SZ; i++) {
+    memset(p.tokens[i], '\0', sizeof(p.tokens[i][0]) * TOKEN_SZ);
+  }
   return p;
+}
+
+// Adds a token to the parser.
+void parser_add_token(Parser *parser, char *token) {
+  assert(parser->tokens_sz < TOKEN_SZ);
+  strcpy(parser->tokens[parser->tokens_sz++], token);
+}
+
+// Tokenizes the parser at a given delimiter.
+void parser_tokenize_at_delim(Parser *parser, char delim) {
+  const size_t tmp_str_cap = 1000;
+  int idx = -1;
+  for (size_t i = 0; i < parser->sz; i++) {
+    if (parser->data[i] != delim && idx == -1) {
+      idx = i;
+    }
+    else if (parser->data[i] == delim) {
+      char tmp[tmp_str_cap];
+      memset(tmp, '\0', sizeof(char) * tmp_str_cap);
+      size_t tmp_str_sz = 0;
+      for (int j = idx; j < i; j++) {
+        assert(tmp_str_sz < tmp_str_cap);
+        tmp[tmp_str_sz++] = parser->data[j];
+      }
+      idx = -1;
+      parser_add_token(parser, tmp);
+    }
+  }
+}
+
+// Dump all tokens in the parser.
+void parser_dump_tokens(const Parser *parser) {
+  for (size_t i = 0; i < parser->tokens_sz; i++) {
+    printf("%s\n", parser->tokens[i]);
+  }
 }
 
 // Appends a character to the parser. If the size
@@ -63,6 +103,15 @@ void cleanup(Parser *parser, int start, int end, char replace) {
   }
   if (replace == '\0') {
     parser->sz -= end - start + 1;
+  }
+}
+
+// Removes all whitespace from the parser.
+void parser_trim(Parser *parser) {
+  for (size_t i = 0; i < parser->sz; i++) {
+    if (parser->data[i] == ' ') {
+      cleanup(parser, i, i, '\0');
+    }
   }
 }
 
