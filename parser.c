@@ -116,13 +116,33 @@ void cleanup(Parser *parser, int start, int end, char replace) {
   }
 }
 
-// Removes all whitespace from the parser.
-void parser_trim(Parser *parser) {
-  for (size_t i = 0; i < parser->sz; i++) {
-    if (parser->data[i] == ' ') {
-      cleanup(parser, i, i, '\0');
-    }
+// Removes all newlines from the parser.
+void parser_remove_whitespace(Parser *parser) {
+  parser_remove(parser, " ");
+}
+
+void *s_malloc(size_t bytes) {
+  void *p = malloc(bytes);
+  if (!p) {
+    fprintf(stderr, "ERROR: failed to safely allocate %zu bytes.\n", bytes);
+    exit(EXIT_FAILURE);
   }
+  return p;
+}
+
+long *parser_tokens_strtol(Parser *parser) {
+  assert(false && "BROKEN");
+  assert(parser->tokens_sz > 0);
+  long *arr = s_malloc(sizeof(long) * parser->tokens_sz);
+  char *tmp;
+  for (size_t i = 0; i < parser->tokens_sz; i++) {
+    arr[i] = strtol(parser->tokens[i], &tmp, 10);
+  }
+}
+
+// Removes all whitespace from the parser.
+void parser_remove_newline(Parser *parser) {
+  parser_remove(parser, "\n");
 }
 
 // This will find all occurrences of `word` in the
@@ -151,7 +171,7 @@ void parser_remove(Parser *parser, const char *word) {
 // Dump the contents of the parser.
 void parser_dump(const Parser *parser) {
   for (size_t i = 0; i < parser->sz; i++) {
-    printf("%c", parser->data[i]);
+    putchar(parser->data[i]);
   }
 }
 

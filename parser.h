@@ -21,7 +21,9 @@ void parser_remove(Parser *, const char *);
 void parser_free(Parser *);
 void parser_assign(Parser *, const char *);
 void parser_tokenize_at_delim(Parser *, char, bool);
-void parser_trim(Parser *);
+void parser_remove_whitespace(Parser *);
+void parser_remove_newline(Parser *);
 void parser_dump_tokens(const Parser *);
+long *parser_tokens_strtol(Parser *);
 
 #endif // PARSER_H
