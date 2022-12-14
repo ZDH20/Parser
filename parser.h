@@ -21,10 +21,11 @@ void parser_remove(Parser *, const char *);
 void parser_free(Parser *);
 void parser_assign(Parser *, const char *);
 void parser_tokenize_at_delim(Parser *, char, bool);
+char *parser_get_token(Parser *, int);
 void parser_remove_whitespace(Parser *);
 void parser_remove_newline(Parser *);
 void parser_dump_tokens(const Parser *, bool);
-long *parser_tokens_strtol(Parser *);
+int *parser_tokens_atoi(Parser *, size_t *);
 void parser_tokenize_at_line(Parser *);
 bool parser_token_eq(Parser *, const char *, int);
 

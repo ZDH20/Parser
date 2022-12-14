@@ -23,6 +23,11 @@ void parser_add_token(Parser *parser, char *token) {
   strcpy(parser->tokens[parser->tokens_sz++], token);
 }
 
+char *parser_get_token(Parser *parser, int idx) {
+  assert(idx <= parser->tokens_sz-1);
+  return parser->tokens[idx];
+}
+
 // Tokenizes the parser at a given delimiter.
 void parser_tokenize_at_delim(Parser *parser, char delim, bool ignore_newline) {
 
@@ -155,14 +160,20 @@ void *s_malloc(size_t bytes) {
   return p;
 }
 
-long *parser_tokens_strtol(Parser *parser) {
-  assert(false && "BROKEN");
+int *parser_tokens_atoi(Parser *parser, size_t *arr_sz) {
   assert(parser->tokens_sz > 0);
-  long *arr = s_malloc(sizeof(long) * parser->tokens_sz);
-  char *tmp;
-  for (size_t i = 0; i < parser->tokens_sz; i++) {
-    arr[i] = strtol(parser->tokens[i], &tmp, 10);
+  int *arr = (int *)malloc(4 * parser->tokens_sz);
+  *arr_sz = 0;
+  if (!arr) {
+    fprintf(stderr, "ERROR: failed to allocate %zu bytes.\n", 4 * parser->tokens_sz);
+    exit(EXIT_FAILURE);
   }
+  for (size_t i = 0; i < parser->tokens_sz; i++) {
+    arr[*arr_sz] = atoi(parser->tokens[i]);
+    *arr_sz += 1;
+  }
+
+  return arr;
 }
 
 // Removes all whitespace from the parser.
