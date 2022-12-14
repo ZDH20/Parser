@@ -24,9 +24,10 @@ void parser_remove_whitespace(Parser *);
 void parser_remove_newline(Parser *);
 
 void parser_tokenize_at_delim(Parser *, char, bool);
+bool parser_token_starts_with(Parser *, char, int);
 void parser_tokens_clear(Parser *);
 void parser_tokenize_at_line(Parser *);
-void parser_dump_tokens(const Parser *, bool);
+void parser_dump_tokens(const Parser *);
 bool parser_token_eq(Parser *, const char *, int);
 char *parser_get_token(Parser *, int);
 int *parser_tokens_atoi(Parser *, size_t *);

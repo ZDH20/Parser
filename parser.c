@@ -66,12 +66,9 @@ void parser_tokenize_at_delim(Parser *parser, char delim, bool ignore_newline) {
 }
 
 // Dump all tokens in the parser.
-void parser_dump_tokens(const Parser *parser, bool add_newlines) {
+void parser_dump_tokens(const Parser *parser) {
   for (size_t i = 0; i < parser->tokens_sz; i++) {
     printf("%s", parser->tokens[i]);
-    if (add_newlines) {
-      putchar('\n');
-    }
   }
 }
 
@@ -79,6 +76,11 @@ bool parser_token_eq(Parser *parser, const char *data, int idx) {
   assert(parser->tokens_sz > 0 && "Parser must be tokenized.\n");
   char *token = parser->tokens[idx];
   return strcmp(token, data) == 0;
+}
+
+bool parser_token_starts_with(Parser *parser, char data, int idx) {
+  assert(idx <= parser->tokens_sz-1);
+  return parser->tokens[idx][0] == data;
 }
 
 void parser_tokenize_at_line(Parser *parser) {
