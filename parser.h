@@ -1,7 +1,7 @@
 #ifndef PARSER_H
 #define PARSER_H
-#define PARSER_INIT_SZ 1000
-#define TOKEN_SZ 1000
+#define PARSER_INIT_SZ 3000
+#define TOKEN_SZ 3000
 
 #include <stdbool.h>
 #include <stdlib.h>
@@ -13,7 +13,7 @@ typedef struct Parser {
   size_t tokens_sz;
 } Parser;
 
-Parser parser_init();
+Parser *parser_alloc();
 void parser_read(Parser *, const char *);
 void parser_dump(const Parser *);
 void parser_append(Parser *, char);

@@ -5,14 +5,14 @@
 #include <string.h>
 
 // Initialize a parser.
-Parser parser_init() {
-  Parser p;
-  p.data = (char *)malloc(sizeof(char) * PARSER_INIT_SZ);
-  p.sz   = 0;
-  p.cap  = PARSER_INIT_SZ;
-  p.tokens_sz = 0;
+Parser *parser_alloc() {
+  Parser *p = malloc(sizeof(Parser));
+  p->data = malloc(sizeof(char) * PARSER_INIT_SZ);
+  p->sz   = 0;
+  p->cap  = PARSER_INIT_SZ;
+  p->tokens_sz = 0;
   for (size_t i = 0; i < TOKEN_SZ; i++) {
-    memset(p.tokens[i], '\0', sizeof(p.tokens[i][0]) * TOKEN_SZ);
+    memset(p->tokens[i], '\0', sizeof(p->tokens[i][0]) * TOKEN_SZ);
   }
   return p;
 }
@@ -221,6 +221,7 @@ void parser_dump(const Parser *parser) {
 // Free memory allocated in the parser.
 void parser_free(Parser *parser) {
   free(parser->data);
+  free(parser);
 }
 
 
