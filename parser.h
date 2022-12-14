@@ -20,13 +20,15 @@ void parser_append(Parser *, char);
 void parser_remove(Parser *, const char *);
 void parser_free(Parser *);
 void parser_assign(Parser *, const char *);
-void parser_tokenize_at_delim(Parser *, char, bool);
-char *parser_get_token(Parser *, int);
 void parser_remove_whitespace(Parser *);
 void parser_remove_newline(Parser *);
-void parser_dump_tokens(const Parser *, bool);
-int *parser_tokens_atoi(Parser *, size_t *);
+
+void parser_tokenize_at_delim(Parser *, char, bool);
+void parser_tokens_clear(Parser *);
 void parser_tokenize_at_line(Parser *);
+void parser_dump_tokens(const Parser *, bool);
 bool parser_token_eq(Parser *, const char *, int);
+char *parser_get_token(Parser *, int);
+int *parser_tokens_atoi(Parser *, size_t *);
 
 #endif // PARSER_H

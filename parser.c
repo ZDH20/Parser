@@ -28,13 +28,18 @@ char *parser_get_token(Parser *parser, int idx) {
   return parser->tokens[idx];
 }
 
+void parser_tokens_clear(Parser *parser) {
+  for (size_t i = 0; i < TOKEN_SZ; i++) {
+    memset(parser->tokens[i], '\0', sizeof(parser->tokens[i][0]) * TOKEN_SZ);
+  }
+  parser->tokens_sz = 0;
+}
+
 // Tokenizes the parser at a given delimiter.
 void parser_tokenize_at_delim(Parser *parser, char delim, bool ignore_newline) {
 
   // Reset the tokens.
-  for (size_t i = 0; i < TOKEN_SZ; i++) {
-    memset(parser->tokens[i], '\0', sizeof(parser->tokens[i][0]) * TOKEN_SZ);
-  }
+  parser_tokens_clear(parser);
 
   // Begin.
   const size_t tmp_str_cap = 1000;
