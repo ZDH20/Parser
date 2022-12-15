@@ -4,6 +4,16 @@
 #include <stdlib.h>
 #include <string.h>
 
+// malloc() with error checking.
+void *s_malloc(size_t bytes) {
+  void *p = malloc(bytes);
+  if (!p) {
+    fprintf(stderr, "ERROR: failed to safely allocate %zu bytes.\n", bytes);
+    exit(EXIT_FAILURE);
+  }
+  return p;
+}
+
 // Initialize a parser.
 Parser *parser_alloc() {
   Parser *p = malloc(sizeof(Parser));
@@ -23,11 +33,13 @@ void parser_add_token(Parser *parser, char *token) {
   strcpy(parser->tokens[parser->tokens_sz++], token);
 }
 
+// Given a valid index, return the token at that index.
 char *parser_get_token(Parser *parser, int idx) {
   assert(idx <= parser->tokens_sz-1);
   return parser->tokens[idx];
 }
 
+// Clears all tokens.
 void parser_tokens_clear(Parser *parser) {
   for (size_t i = 0; i < TOKEN_SZ; i++) {
     memset(parser->tokens[i], '\0', sizeof(parser->tokens[i][0]) * TOKEN_SZ);
@@ -72,17 +84,22 @@ void parser_dump_tokens(const Parser *parser) {
   }
 }
 
+// Given a valid index, checks that token to param `data`.
 bool parser_token_eq(Parser *parser, const char *data, int idx) {
   assert(parser->tokens_sz > 0 && "Parser must be tokenized.\n");
   char *token = parser->tokens[idx];
   return strcmp(token, data) == 0;
 }
 
+// Given a valid index, checks if the token starts with the param `data`.
 bool parser_token_starts_with(Parser *parser, char data, int idx) {
   assert(idx <= parser->tokens_sz-1);
   return parser->tokens[idx][0] == data;
 }
 
+// Tokenizes by newlines. Does not include newlines.
+// If a line consists of just a newline, it will be
+// replaced with '\0'.
 void parser_tokenize_at_line(Parser *parser) {
   assert(parser->tokens_sz == 0 && "Tokens must not exist.\n");
   char buff[1000];
@@ -158,32 +175,20 @@ void parser_remove_whitespace(Parser *parser) {
   parser_remove(parser, " ");
 }
 
-void *s_malloc(size_t bytes) {
-  void *p = malloc(bytes);
-  if (!p) {
-    fprintf(stderr, "ERROR: failed to safely allocate %zu bytes.\n", bytes);
-    exit(EXIT_FAILURE);
-  }
-  return p;
-}
-
+// Returns the tokens in the form of a pointer of integers.
+// The size will be put into the param `arr_sz`.
 int *parser_tokens_atoi(Parser *parser, size_t *arr_sz) {
   assert(parser->tokens_sz > 0);
-  int *arr = (int *)malloc(4 * parser->tokens_sz);
+  int *arr = s_malloc(4 * parser->tokens_sz);
   *arr_sz = 0;
-  if (!arr) {
-    fprintf(stderr, "ERROR: failed to allocate %zu bytes.\n", 4 * parser->tokens_sz);
-    exit(EXIT_FAILURE);
-  }
   for (size_t i = 0; i < parser->tokens_sz; i++) {
     arr[*arr_sz] = atoi(parser->tokens[i]);
     *arr_sz += 1;
   }
-
   return arr;
 }
 
-// Removes all whitespace from the parser.
+// Removes all newlines from the parser.
 void parser_remove_newline(Parser *parser) {
   parser_remove(parser, "\n");
 }
@@ -224,4 +229,8 @@ void parser_free(Parser *parser) {
   free(parser);
 }
 
-
+// General information about the parser.
+void parser_debug(const Parser *parser) {
+  printf("Parser size: %zu\n", sizeof(parser));
+  printf("Number of tokens: %zu\n", parser->tokens_sz);
+}

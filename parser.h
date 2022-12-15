@@ -22,6 +22,7 @@ void parser_free(Parser *);
 void parser_assign(Parser *, const char *);
 void parser_remove_whitespace(Parser *);
 void parser_remove_newline(Parser *);
+void parser_debug(const Parser *);
 
 void parser_tokenize_at_delim(Parser *, char, bool);
 bool parser_token_starts_with(Parser *, char, int);
