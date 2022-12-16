@@ -113,7 +113,7 @@ bool parser_token_starts_with(Parser *parser, char data, int idx) {
 // Tokenizes by newlines. Does not include newlines.
 // If a line consists of just a newline, it will be
 // replaced with '\0'.
-void parser_tokenize_at_line(Parser *parser) {
+void parser_tokenize_lines(Parser *parser) {
   assert(parser->tokens_sz == 0 && "Tokens must not exist.\n");
   char buff[1000];
   size_t buff_sz = 0;
@@ -183,7 +183,7 @@ void cleanup(Parser *parser, int start, int end, char replace) {
   }
 }
 
-// Removes all newlines from the parser.
+// Removes all whitespace from the parser.
 void parser_remove_whitespace(Parser *parser) {
   parser_remove(parser, " ");
 }

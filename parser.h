@@ -29,7 +29,7 @@ size_t parser_tokens_sz(const Parser *);
 void parser_tokenize_at_delim(Parser *, char, bool);
 bool parser_token_starts_with(Parser *, char, int);
 void parser_tokens_clear(Parser *);
-void parser_tokenize_at_line(Parser *);
+void parser_tokenize_lines(Parser *);
 void parser_dump_tokens(const Parser *);
 bool parser_token_eq(Parser *, const char *, int);
 char *parser_get_token(Parser *, int);
