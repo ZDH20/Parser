@@ -77,10 +77,23 @@ void parser_tokenize_at_delim(Parser *parser, char delim, bool ignore_newline) {
   }
 }
 
+size_t parser_tokens_sz(const Parser *parser) {
+  return parser->tokens_sz;
+}
+
+bool parser_token_empty(const Parser *parser, int idx) {
+  assert(idx <= parser->tokens_sz-1);
+  return *parser->tokens[idx] == '\0';
+}
+
 // Dump all tokens in the parser.
 void parser_dump_tokens(const Parser *parser) {
   for (size_t i = 0; i < parser->tokens_sz; i++) {
-    printf("%s", parser->tokens[i]);
+    if (*parser->tokens[i] == '\0') {
+      printf("\nEMPTY TOKEN AT INDEX: %zu\n", i);
+    } else {
+      printf("%s", parser->tokens[i]);
+    }
   }
 }
 
@@ -231,6 +244,6 @@ void parser_free(Parser *parser) {
 
 // General information about the parser.
 void parser_debug(const Parser *parser) {
-  printf("Parser size: %zu\n", sizeof(parser));
+  printf("Parser size: %zu\n", sizeof(*parser));
   printf("Number of tokens: %zu\n", parser->tokens_sz);
 }
