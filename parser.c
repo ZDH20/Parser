@@ -1,8 +1,12 @@
 #include "parser.h"
 #include <assert.h>
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#define PANIC(stream, err) fprintf(stream, "PANIC: %s in function %s()\n", err, __func__); \
+    exit(1);
 
 // malloc() with error checking.
 void *s_malloc(size_t bytes) {
@@ -29,18 +33,23 @@ Parser *parser_alloc() {
 
 // Adds a token to the parser.
 void parser_add_token(Parser *parser, char *token) {
-  assert(parser->tokens_sz < TOKEN_SZ);
+  if (parser->tokens_sz >= TOKEN_SZ) {
+    PANIC(stderr, "Tokens have reached max capacity");
+  }
   strcpy(parser->tokens[parser->tokens_sz++], token);
 }
 
 // Given a valid index, return the token at that index.
 char *parser_get_token(Parser *parser, int idx) {
-  assert(idx <= parser->tokens_sz-1);
+  if (idx >= parser->tokens_sz-1) {
+    PANIC(stderr, "index is not within bounds of the tokens")
+  }
   return parser->tokens[idx];
 }
 
 // Clears all tokens.
 void parser_tokens_clear(Parser *parser) {
+  if (parser->tokens_sz == 0) return;
   for (size_t i = 0; i < TOKEN_SZ; i++) {
     memset(parser->tokens[i], '\0', sizeof(parser->tokens[i][0]) * TOKEN_SZ);
   }
@@ -48,7 +57,7 @@ void parser_tokens_clear(Parser *parser) {
 }
 
 // Tokenizes the parser at a given delimiter.
-void parser_tokenize_at_delim(Parser *parser, char delim, bool ignore_newline) {
+void parser_tokenize_at_delim(Parser *parser, char delim/*, bool ignore_newline*/) {
 
   // Reset the tokens.
   parser_tokens_clear(parser);
@@ -67,7 +76,7 @@ void parser_tokenize_at_delim(Parser *parser, char delim, bool ignore_newline) {
       // Build the temporary string as a token.
       for (int j = idx; j < i; j++) {
         assert(tmp_str_sz < tmp_str_cap);
-        if (parser->data[j] == '\n' && ignore_newline) continue;
+        /* if (parser->data[j] == '\n' && ignore_newline) continue; */
         tmp[tmp_str_sz++] = parser->data[j];
       }
       // Add the token.
@@ -82,7 +91,9 @@ size_t parser_tokens_sz(const Parser *parser) {
 }
 
 bool parser_token_empty(const Parser *parser, int idx) {
-  assert(idx <= parser->tokens_sz-1);
+  if (idx >= parser->tokens_sz-1) {
+    PANIC(stderr, "index is not within bounds of the tokens")
+  }
   return *parser->tokens[idx] == '\0';
 }
 
@@ -99,14 +110,18 @@ void parser_dump_tokens(const Parser *parser) {
 
 // Given a valid index, checks that token to param `data`.
 bool parser_token_eq(Parser *parser, const char *data, int idx) {
-  assert(parser->tokens_sz > 0 && "Parser must be tokenized.\n");
+  if (parser->tokens_sz == 0) {
+    PANIC(stderr, "parser must be tokenized");
+  }
   char *token = parser->tokens[idx];
   return strcmp(token, data) == 0;
 }
 
 // Given a valid index, checks if the token starts with the param `data`.
 bool parser_token_starts_with(Parser *parser, char data, int idx) {
-  assert(idx <= parser->tokens_sz-1);
+  if (parser->tokens_sz == 0) {
+    PANIC(stderr, "parser must be tokenized");
+  }
   return parser->tokens[idx][0] == data;
 }
 
@@ -114,7 +129,9 @@ bool parser_token_starts_with(Parser *parser, char data, int idx) {
 // If a line consists of just a newline, it will be
 // replaced with '\0'.
 void parser_tokenize_lines(Parser *parser) {
-  assert(parser->tokens_sz == 0 && "Tokens must not exist.\n");
+  if (parser->tokens_sz == 0) {
+    PANIC(stderr, "parser must be tokenized");
+  }
   char buff[1000];
   size_t buff_sz = 0;
   memset(buff, '\0', 1000);
@@ -190,11 +207,24 @@ void parser_remove_whitespace(Parser *parser) {
 
 // Returns the tokens in the form of a pointer of integers.
 // The size will be put into the param `arr_sz`.
+// Ignores tokens that are not numbers.
 int *parser_tokens_atoi(Parser *parser, size_t *arr_sz) {
-  assert(parser->tokens_sz > 0);
+  if (parser->tokens_sz == 0) {
+    PANIC(stderr, "parser must be tokenized");
+  }
   int *arr = s_malloc(4 * parser->tokens_sz);
   *arr_sz = 0;
   for (size_t i = 0; i < parser->tokens_sz; i++) {
+    bool restart = false;
+    for (int j = 0; parser->tokens[i][j] != '\0'; j++) {
+      if (!isdigit(parser->tokens[i][j])) {
+        restart = true;
+        break;
+      }
+    }
+    if (restart) {
+      continue;
+    }
     arr[*arr_sz] = atoi(parser->tokens[i]);
     *arr_sz += 1;
   }
@@ -231,9 +261,10 @@ void parser_remove(Parser *parser, const char *word) {
 
 // Dump the contents of the parser.
 void parser_dump(const Parser *parser) {
-  for (size_t i = 0; i < parser->sz; i++) {
-    putchar(parser->data[i]);
-  }
+  printf("%s", parser->data);
+  /* for (size_t i = 0; i < parser->sz; i++) { */
+  /*   putchar(parser->data[i]); */
+  /* } */
 }
 
 // Free memory allocated in the parser.
