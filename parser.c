@@ -41,7 +41,7 @@ void parser_add_token(Parser *parser, char *token) {
 
 // Given a valid index, return the token at that index.
 char *parser_get_token(Parser *parser, int idx) {
-  if (idx >= parser->tokens_sz-1) {
+  if (idx > parser->tokens_sz-1) {
     PANIC(stderr, "index is not within bounds of the tokens")
   }
   return parser->tokens[idx];
@@ -65,11 +65,11 @@ void parser_tokenize_at_delim(Parser *parser, char delim/*, bool ignore_newline*
   // Begin.
   const size_t tmp_str_cap = 1000;
   int idx = -1;
-  for (size_t i = 0; i < parser->sz; i++) {
+  for (size_t i = 0; i < parser->sz+1; i++) {
     if (parser->data[i] != delim && idx == -1) {
       idx = i;
     }
-    else if (parser->data[i] == delim) {
+    else if (parser->data[i] == delim || i == parser->sz) {
       char tmp[tmp_str_cap];
       size_t tmp_str_sz = 0;
       memset(tmp, '\0', sizeof(char) * tmp_str_cap);
@@ -82,6 +82,9 @@ void parser_tokenize_at_delim(Parser *parser, char delim/*, bool ignore_newline*
       // Add the token.
       parser_add_token(parser, tmp);
       idx = -1;
+      if (i == parser->sz) {
+        break;
+      }
     }
   }
 }
