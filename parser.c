@@ -94,7 +94,7 @@ size_t parser_tokens_sz(const Parser *parser) {
 }
 
 bool parser_token_empty(const Parser *parser, int idx) {
-  if (idx >= parser->tokens_sz-1) {
+  if (idx > parser->tokens_sz-1) {
     PANIC(stderr, "index is not within bounds of the tokens")
   }
   return *parser->tokens[idx] == '\0';
@@ -132,9 +132,6 @@ bool parser_token_starts_with(Parser *parser, char data, int idx) {
 // If a line consists of just a newline, it will be
 // replaced with '\0'.
 void parser_tokenize_lines(Parser *parser) {
-  if (parser->tokens_sz == 0) {
-    PANIC(stderr, "parser must be tokenized");
-  }
   char buff[1000];
   size_t buff_sz = 0;
   memset(buff, '\0', 1000);
